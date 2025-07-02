@@ -1,11 +1,11 @@
 import express from 'express';
-import verifyAdmin from '../../middlewares/verifyAdmin.js';
+import verifyAdmin from '../middlewares/verifyAdmin.js';
 import {
   createBlog,
   getBlogs,
   updateBlog,
   deleteBlog
-} from '../../controllers/admin/blogController.js';
+} from '../controllers/adminBlog.js';
 
 const router = express.Router();
 

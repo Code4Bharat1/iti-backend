@@ -1,11 +1,11 @@
 import express from 'express';
-import verifyAdmin from '../../middlewares/verifyAdmin.js';
+import verifyAdmin from '../middlewares/verifyAdmin.js';
 import {
   createNotice,
   getNotices,
   updateNotice,
   deleteNotice
-} from '../controllers/admin/noticeController.js';
+} from '../controllers/adminNotice.js';
 
 const router = express.Router();
 
