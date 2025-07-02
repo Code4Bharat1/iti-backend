@@ -1,7 +1,7 @@
 // controllers/admin/authController.js
 
-import Admin from '../../models/Admin.js';
-import OTP from '../../models/OTP.js';
+import Admin from '../models/Admin.js';
+import OTP from '../models/Otp.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
