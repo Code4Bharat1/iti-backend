@@ -64,20 +64,33 @@ export const getNotices = async (req, res) => {
 // Update a notice
 export const updateNotice = async (req, res) => {
   const { id } = req.params;
-  const { user, description, date } = req.body;
+  const { description, date } = req.body;
 
   try {
+    const admin = await Admin.findById(req.adminId);
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+
+    const formattedDate = new Date(date).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
     const notice = await Notice.findByIdAndUpdate(
       id,
-      { user, description, date, action: 'updated' },
+      {
+        user: admin.email,
+        description,
+        date: formattedDate,
+        action: 'updated'
+      },
       { new: true }
     );
-
 
     if (!notice) return res.status(404).json({ message: 'Notice not found' });
 
     await Activity.create({
-      user,
+      user: admin.email,
       action: 'updated',
       section: 'notice',
       dateTime: new Date(),
