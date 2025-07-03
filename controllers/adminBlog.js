@@ -9,12 +9,18 @@ export const createBlog = async (req, res) => {
   const adminId = req.adminId;
 
   try {
+    const formattedDate = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
     const blog = await Blog.create({
       title,
       image,
       content,
-      date: date || new Date(),
-      createdBy: adminId,
+      date: formattedDate,
     });
 
     await Activity.create({
@@ -46,11 +52,18 @@ export const updateBlog = async (req, res) => {
   const { title, image, content, date } = req.body;
 
   try {
-    const blog = await Blog.findByIdAndUpdate(
-      id,
-      { title, image, content, date },
-      { new: true }
-    );
+    const formattedDate = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    const blog = await Blog.create({
+      title,
+      image,
+      content,
+      date: formattedDate,
+    });
 
     if (!blog) return res.status(404).json({ message: 'Blog not found' });
 
