@@ -1,10 +1,22 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const noticeSchema = new mongoose.Schema({
-  user: { type: String, required: true },
-  description: { type: String, required: true },
-  date: { type: Date, default: Date.now },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
+  user: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  date: {
+    type: String,
+    required: true
+  },
+  action: {
+    type: String,
+    default: 'created'
+  }
 }, { timestamps: true });
 
-export default mongoose.model("Notice", noticeSchema);
+export default mongoose.model('Notice', noticeSchema);

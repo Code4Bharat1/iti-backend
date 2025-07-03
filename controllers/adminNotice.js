@@ -2,22 +2,33 @@
 
 import Notice from '../models/Notice.js';
 import Activity from '../models/Activity.js';
+import Admin from '../models/Admin.js';
 
 // Create a new notice
 export const createNotice = async (req, res) => {
-  const { user, description, date } = req.body;
-  const adminId = req.adminId; // get from middleware (JWT)
+  const { description, date } = req.body;
 
   try {
-    const notice = await Notice.create({
-      user,
-      description,
-      date: date || new Date(),
-      createdBy: adminId,
+    const admin = await Admin.findById(req.adminId);
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+
+    // ✅ Format the date: "03 July 2025"
+    const formattedDate = new Date(date).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
     });
 
+    const notice = await Notice.create({
+      user: admin.email,
+      description,
+      date: formattedDate,
+      action: 'created'
+    });
+
+
     await Activity.create({
-      user,
+      user: admin.email,
       action: 'created',
       section: 'notice',
       dateTime: new Date(),
@@ -33,7 +44,18 @@ export const createNotice = async (req, res) => {
 export const getNotices = async (req, res) => {
   try {
     const notices = await Notice.find().sort({ createdAt: -1 });
-    res.status(200).json(notices);
+
+    // Format the date for each notice
+    const formattedNotices = notices.map(notice => ({
+      ...notice._doc,
+      date: new Date(notice.date).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      })
+    }));
+
+    res.status(200).json(formattedNotices);
   } catch (err) {
     res.status(500).json({ message: 'Failed to fetch notices', error: err.message });
   }
@@ -47,9 +69,10 @@ export const updateNotice = async (req, res) => {
   try {
     const notice = await Notice.findByIdAndUpdate(
       id,
-      { user, description, date },
+      { user, description, date, action: 'updated' },
       { new: true }
     );
+
 
     if (!notice) return res.status(404).json({ message: 'Notice not found' });
 
