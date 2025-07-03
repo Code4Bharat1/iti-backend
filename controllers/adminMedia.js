@@ -3,14 +3,17 @@
 import Image from '../models/Image.js';
 import Video from '../models/Video.js';
 import Activity from '../models/Activity.js';
+import Admin from '../models/Admin.js';
 
 // Upload an image
 export const uploadImage = async (req, res) => {
   const { imageUrl } = req.body;
-  const adminId = req.adminId;
+
 
   try {
-    const image = await Image.create({ url: imageUrl, uploadedBy: adminId });
+     const adminId = await Admin.findById(req.adminId);
+        if (!adminId) return res.status(404).json({ message: 'Admin not found' });
+    const image = await Image.create({ imageUrl: imageUrl, uploadedBy: adminId });
 
     await Activity.create({
       user: 'admin',
@@ -49,10 +52,12 @@ export const deleteImage = async (req, res) => {
 // Upload a video
 export const uploadVideo = async (req, res) => {
   const { videoUrl } = req.body;
-  const adminId = req.adminId;
+  // const adminId = req.adminId;
 
   try {
-    const video = await Video.create({ url: videoUrl, uploadedBy: adminId });
+       const adminId = await Admin.findById(req.adminId);
+        if (!adminId) return res.status(404).json({ message: 'Admin not found' });
+    const video = await Video.create({ videoUrl, uploadedBy: adminId });
 
     await Activity.create({
       user: 'admin',
