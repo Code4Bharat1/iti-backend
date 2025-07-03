@@ -2,13 +2,16 @@
 
 import Topper from '../models/Topper.js';
 import Activity from '../models/Activity.js';
+import Admin from '../models/Admin.js';
 
 // Add a new topper
 export const addTopper = async (req, res) => {
   const { studentName, trade, percentage } = req.body;
-  const adminId = req.adminId;
+  
 
   try {
+    const adminId=await Admin.findById(req.adminId);
+    if(!adminId) return res.status(404).json("admin id not found");
     const topper = await Topper.create({
       studentName,
       trade,
@@ -19,7 +22,7 @@ export const addTopper = async (req, res) => {
     await Activity.create({
       user: 'admin',
       action: 'added',
-      section: 'toppersList',
+      section: 'topper',
       dateTime: new Date(),
     });
 
@@ -52,13 +55,13 @@ export const updateTopper = async (req, res) => {
     );
 
     if (!topper) return res.status(404).json({ message: 'Topper not found' });
-
     await Activity.create({
-      user: 'admin',
-      action: 'updated',
-      section: 'toppersList',
-      dateTime: new Date(),
-    });
+  user: 'admin',
+  action: 'added',
+  section: 'topper',  // ✅ should match your enum value
+  dateTime: new Date(),
+});
+
 
     res.status(200).json(topper);
   } catch (err) {
@@ -77,7 +80,7 @@ export const deleteTopper = async (req, res) => {
     await Activity.create({
       user: 'admin',
       action: 'deleted',
-      section: 'toppersList',
+      section: 'topper',
       dateTime: new Date(),
     });
 

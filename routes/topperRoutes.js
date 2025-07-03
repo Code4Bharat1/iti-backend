@@ -1,22 +1,19 @@
 import express from 'express';
 import verifyAdmin from '../middlewares/verifyAdmin.js';
 import {
-  uploadImage,
-  deleteImage,
-  uploadVideo,
-  deleteVideo
-} from '../controllers/adminMedia.js';
+  addTopper,
+  getToppers,
+  updateTopper,
+  deleteTopper
+} from '../controllers/adminTopper.js';
 
 const router = express.Router();
 
 router.use(verifyAdmin);
 
 // Images
-router.post('/images', uploadImage);
-router.delete('/images/:id', deleteImage);
-
-// Videos
-router.post('/videos', uploadVideo);
-router.delete('/videos/:id', deleteVideo);
-
+router.post("/addTopper",addTopper);
+router.get("/getTopper",getToppers);
+router.put("/updateTopper/:id",updateTopper);
+router.delete("/deleteTopper/:id",deleteTopper);
 export default router;
