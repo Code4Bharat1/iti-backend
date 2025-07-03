@@ -1,11 +1,11 @@
 import express from 'express';
-import verifyAdmin from '../../middlewares/verifyAdmin.js';
+import verifyAdmin from '../middlewares/verifyAdmin.js';
 import {
   uploadImage,
   deleteImage,
   uploadVideo,
   deleteVideo
-} from '../../controllers/admin/mediaController.js';
+} from '../controllers/adminMedia.js';
 
 const router = express.Router();
 

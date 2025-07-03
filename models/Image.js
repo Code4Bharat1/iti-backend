@@ -5,4 +5,4 @@ const imageSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
 }, { timestamps: true });
 
-export const Image = mongoose.model("Image", imageSchema);
+export default mongoose.model("Image", imageSchema);

@@ -1,6 +1,6 @@
 import express from 'express';
-import verifyAdmin from '../../middlewares/verifyAdmin.js';
-import { getRecentActivities } from '../../controllers/admin/activityController.js';
+import verifyAdmin from '../middlewares/verifyAdmin.js';
+import { getRecentActivities } from '../controllers/adminActivity.js';
 
 const router = express.Router();
 

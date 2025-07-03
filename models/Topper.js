@@ -7,4 +7,4 @@ const topperSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
 }, { timestamps: true });
 
-export const Topper = mongoose.model("Topper", topperSchema);
+export default mongoose.model("Topper", topperSchema);

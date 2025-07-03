@@ -7,4 +7,4 @@ const noticeSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
 }, { timestamps: true });
 
-export const Notice = mongoose.model("Notice", noticeSchema);
+export default mongoose.model("Notice", noticeSchema);

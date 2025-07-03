@@ -8,4 +8,4 @@ const blogSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
 }, { timestamps: true });
 
-export const Blog = mongoose.model("Blog", blogSchema);
+export default mongoose.model("Blog", blogSchema);

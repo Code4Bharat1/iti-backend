@@ -5,4 +5,4 @@ const videoSchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
 }, { timestamps: true });
 
-export const Video = mongoose.model("Video", videoSchema);
+export default mongoose.model("Video", videoSchema);

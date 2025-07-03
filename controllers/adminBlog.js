@@ -1,6 +1,6 @@
 // controllers/admin/blogController.js
 
-import Blog from '../models/Blog';
+import Blog from '../models/Blog.js';
 import Activity from '../models/Activity.js';
 
 // Create a new blog
