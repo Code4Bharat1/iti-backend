@@ -5,15 +5,44 @@ import Video from '../models/Video.js';
 import Activity from '../models/Activity.js';
 import Admin from '../models/Admin.js';
 
+
+
 // Upload an image
+// export const uploadImage = async (req, res) => {
+//   const { imageUrl } = req.body;
+
+
+//   try {
+//      const adminId = await Admin.findById(req.adminId);
+//         if (!adminId) return res.status(404).json({ message: 'Admin not found' });
+//     const image = await Image.create({ imageUrl: imageUrl, uploadedBy: adminId });
+
+//     await Activity.create({
+//       user: 'admin',
+//       action: 'uploaded',
+//       section: 'image',
+//       dateTime: new Date(),
+//     });
+
+//     res.status(201).json(image);
+//   } catch (err) {
+//     res.status(500).json({ message: 'Failed to upload image', error: err.message });
+//   }
+// };// If you're using Next.js API routes or Express
 export const uploadImage = async (req, res) => {
-  const { imageUrl } = req.body;
-
-
   try {
-     const adminId = await Admin.findById(req.adminId);
-        if (!adminId) return res.status(404).json({ message: 'Admin not found' });
-    const image = await Image.create({ imageUrl: imageUrl, uploadedBy: adminId });
+    const adminId = await Admin.findById(req.adminId);
+    if (!adminId) return res.status(404).json({ message: 'Admin not found' });
+
+    // ✅ Now req.file has the uploaded file
+    const file = req.file;
+    if (!file) return res.status(400).json({ message: 'No file uploaded' });
+
+    // ✅ Build the real URL
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
+
+    // ✅ Save it in DB
+    const image = await Image.create({ imageUrl, uploadedBy: adminId });
 
     await Activity.create({
       user: 'admin',
@@ -27,6 +56,7 @@ export const uploadImage = async (req, res) => {
     res.status(500).json({ message: 'Failed to upload image', error: err.message });
   }
 };
+
 
 // Delete an image
 export const deleteImage = async (req, res) => {
@@ -48,7 +78,15 @@ export const deleteImage = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete image', error: err.message });
   }
 };
-
+export const getImage = async (req, res) => {
+  try {
+    const images = await Image.find();
+    res.status(200).json(images)
+  }
+  catch (err) {
+    res.status(500).json({message:'failed to fetch the image',error:err.message})
+  }
+}
 // Upload a video
 export const uploadVideo = async (req, res) => {
   const { videoUrl } = req.body;
