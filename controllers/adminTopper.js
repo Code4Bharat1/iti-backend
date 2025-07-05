@@ -7,16 +7,18 @@ import Admin from '../models/Admin.js';
 // Add a new topper
 export const addTopper = async (req, res) => {
   const { studentName, trade, percentage } = req.body;
-  
 
   try {
-    const adminId=await Admin.findById(req.adminId);
-    if(!adminId) return res.status(404).json("admin id not found");
+    const admin = await Admin.findById(req.adminId);
+    console.log("req.adminId:", req.adminId);
+
+    if (!admin) return res.status(404).json("Admin ID not found");
+
     const topper = await Topper.create({
       studentName,
       trade,
       percentage,
-      createdBy: adminId,
+      createdBy: admin._id,  // ✅ fixed!
     });
 
     await Activity.create({
@@ -28,6 +30,7 @@ export const addTopper = async (req, res) => {
 
     res.status(201).json(topper);
   } catch (err) {
+    console.error("Add topper failed:", err); // ✅ always log the real error
     res.status(500).json({ message: 'Failed to add topper', error: err.message });
   }
 };
@@ -73,7 +76,9 @@ export const updateTopper = async (req, res) => {
 export const deleteTopper = async (req, res) => {
   const { id } = req.params;
 
+
   try {
+    console.log("id: ",id)
     const topper = await Topper.findByIdAndDelete(id);
     if (!topper) return res.status(404).json({ message: 'Topper not found' });
 
