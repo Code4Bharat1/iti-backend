@@ -1,12 +1,19 @@
 // controllers/admin/blogController.js
 
-import Blog from '../models/Blog.js';
 import Activity from '../models/Activity.js';
+import Blog from '../models/Blog.js';
+import Image from '../models/Image.js';
 
 // Create a new blog
 export const createBlog = async (req, res) => {
-  const { title, image, content, date } = req.body;
-  const adminId = req.adminId;
+  const { title, content, date } = req.body;
+  // ✅ Build the real URL
+  const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+  const adminId = req.user?.id || 'admin'; // fallback for testing
+
+  // ✅ Save it in DB
+  const image = await Image.create({ imageUrl, uploadedBy: adminId });
 
   try {
     const formattedDate = new Date().toLocaleDateString('en-US', {
@@ -18,10 +25,11 @@ export const createBlog = async (req, res) => {
 
     const blog = await Blog.create({
       title,
-      image,
+      image: image.imageUrl,
       content,
       date: formattedDate,
     });
+
 
     await Activity.create({
       user: 'admin',
