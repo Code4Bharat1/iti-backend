@@ -87,15 +87,40 @@ export const getImage = async (req, res) => {
     res.status(500).json({message:'failed to fetch the image',error:err.message})
   }
 }
+export const getVideo=async(req,res)=>{
+  try{
+    const videos=await Video.find();
+    res.status(200).json(videos);
+  }
+  catch(err){
+    res.status(500).json({message:"failed to fetch the videos",error:err.message})
+  }
+}
 // Upload a video
-export const uploadVideo = async (req, res) => {
-  const { videoUrl } = req.body;
-  // const adminId = req.adminId;
 
+
+export const uploadVideo = async (req, res) => {
   try {
-       const adminId = await Admin.findById(req.adminId);
-        if (!adminId) return res.status(404).json({ message: 'Admin not found' });
-    const video = await Video.create({ videoUrl, uploadedBy: adminId });
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({ message: 'No video file uploaded' });
+    }
+
+    // Get adminId from middleware (you mentioned it's available in req.adminId)
+    const admin = await Admin.findById(req.adminId);
+
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+
+    // Save the relative path (served at /uploads/...)
+    const videoUrl = `/uploads/${file.filename}`;
+
+    const video = await Video.create({
+      videoUrl,
+      uploadedBy: admin._id, // or admin.name/email if you prefer
+    });
 
     await Activity.create({
       user: 'admin',
@@ -106,9 +131,11 @@ export const uploadVideo = async (req, res) => {
 
     res.status(201).json(video);
   } catch (err) {
+    console.error('Upload Error:', err);
     res.status(500).json({ message: 'Failed to upload video', error: err.message });
   }
 };
+
 
 // Delete a video
 export const deleteVideo = async (req, res) => {
