@@ -64,19 +64,26 @@ export const updateBlog = async (req, res) => {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
-    });
-    const blog = await Blog.create({
-      title,
-      image,
-      content,
-      date: formattedDate,
+      day: 'numeric',
     });
 
-    if (!blog) return res.status(404).json({ message: 'Blog not found' });
+    const blog = await Blog.findByIdAndUpdate(
+      id,
+      {
+        title,
+        image,
+        content,
+        date: formattedDate,
+      },
+      { new: true } // return updated blog
+    );
+
+    if (!blog) {
+      return res.status(404).json({ message: 'Blog not found' });
+    }
 
     await Activity.create({
-      user: 'admin',
+      user: req.user?.id || 'admin',
       action: 'updated',
       section: 'blog',
       dateTime: new Date(),
