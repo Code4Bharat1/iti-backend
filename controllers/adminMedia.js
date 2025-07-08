@@ -7,28 +7,6 @@ import Admin from '../models/Admin.js';
 
 
 
-// Upload an image
-// export const uploadImage = async (req, res) => {
-//   const { imageUrl } = req.body;
-
-
-//   try {
-//      const adminId = await Admin.findById(req.adminId);
-//         if (!adminId) return res.status(404).json({ message: 'Admin not found' });
-//     const image = await Image.create({ imageUrl: imageUrl, uploadedBy: adminId });
-
-//     await Activity.create({
-//       user: 'admin',
-//       action: 'uploaded',
-//       section: 'image',
-//       dateTime: new Date(),
-//     });
-
-//     res.status(201).json(image);
-//   } catch (err) {
-//     res.status(500).json({ message: 'Failed to upload image', error: err.message });
-//   }
-// };// If you're using Next.js API routes or Express
 export const uploadImage = async (req, res) => {
   try {
     const adminId = await Admin.findById(req.adminId);
@@ -78,6 +56,7 @@ export const deleteImage = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete image', error: err.message });
   }
 };
+//get images
 export const getImage = async (req, res) => {
   try {
     const images = await Image.find();
