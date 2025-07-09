@@ -35,7 +35,7 @@ export const loginOrSignup = async (req, res) => {
 // Get admin details using token
 export const getAdminDetails = async (req, res) => {
   try {
-    const admin = await Admin.findById(req.adminId).select('-password'); // exclude password
+    const admin = await Admin.findById(req.admin._id).select('-password'); // exclude password
 
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found' });

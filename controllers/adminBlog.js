@@ -1,117 +1,76 @@
-// controllers/admin/blogController.js
+import Blog from "../models/Blog.js";
+import Activity from "../models/Activity.js";
 
-import Activity from '../models/Activity.js';
-import Blog from '../models/Blog.js';
-import Image from '../models/Image.js';
-
-// Create a new blog
-export const createBlog = async (req, res) => {
-  const { title, content, date } = req.body;
-  // ✅ Build the real URL
-  const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-
-  const adminId = req.user?.id || 'admin'; // fallback for testing
-
-  // ✅ Save it in DB
-  const image = await Image.create({ imageUrl, uploadedBy: adminId });
-
-  try {
-    const formattedDate = new Date().toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-
-    const blog = await Blog.create({
-      title,
-      image: image.imageUrl,
-      content,
-      date: formattedDate,
-    });
-
-
-    await Activity.create({
-      user: 'admin',
-      action: 'created',
-      section: 'blog',
-      dateTime: new Date(),
-    });
-
-    res.status(201).json(blog);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to create blog', error: err.message });
-  }
+// Helper to log admin activities
+const logActivity = async (adminId, action) => {
+  await Activity.create({
+    user: adminId,
+    action,
+    section: "blog"
+  });
 };
 
-// Get all blogs
 export const getBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find().sort({ createdAt: -1 });
-    res.status(200).json(blogs);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch blogs', error: err.message });
+    res.json(blogs);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to get blogs" });
   }
 };
 
-// Update a blog
+export const createBlog = async (req, res) => {
+  try {
+    const { title, content, date } = req.body;
+    const image = req.file ? `/uploads/${req.file.filename}` : '';
+
+    const newBlog = new Blog({
+      title,
+      content,
+      image,
+      date,
+      createdBy: req.admin._id,
+    });
+
+    await newBlog.save();
+
+    // Save admin activity
+    await Activity.create({
+      user: req.admin.name || req.admin._id,
+      action: 'added',
+      section: 'blog',
+    });
+
+    res.status(201).json(newBlog);
+  } catch (err) {
+    console.error('Error adding blog:', err); // 👈 Log full error to backend console
+    res.status(500).json({ error: 'Failed to add blog' }); // 👈 Send clear error
+  }
+};
+
+
 export const updateBlog = async (req, res) => {
-  const { id } = req.params;
-  const { title, image, content, date } = req.body;
-
   try {
-    const formattedDate = new Date().toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    const { id } = req.params;
+    const updatedBlog = await Blog.findByIdAndUpdate(id, req.body, { new: true });
+    if (!updatedBlog) return res.status(404).json({ error: "Blog not found" });
 
-    const blog = await Blog.findByIdAndUpdate(
-      id,
-      {
-        title,
-        image,
-        content,
-        date: formattedDate,
-      },
-      { new: true } // return updated blog
-    );
-
-    if (!blog) {
-      return res.status(404).json({ message: 'Blog not found' });
-    }
-
-    await Activity.create({
-      user: req.user?.id || 'admin',
-      action: 'updated',
-      section: 'blog',
-      dateTime: new Date(),
-    });
-
-    res.status(200).json(blog);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to update blog', error: err.message });
+    await logActivity(req.admin._id, "updated");
+    res.json(updatedBlog);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update blog" });
   }
 };
 
-// Delete a blog
 export const deleteBlog = async (req, res) => {
-  const { id } = req.params;
-
   try {
-    const blog = await Blog.findByIdAndDelete(id);
-    if (!blog) return res.status(404).json({ message: 'Blog not found' });
+    const { id } = req.params;
+    const deletedBlog = await Blog.findByIdAndDelete(id);
+    if (!deletedBlog) return res.status(404).json({ error: "Blog not found" });
 
-    await Activity.create({
-      user: 'admin',
-      action: 'deleted',
-      section: 'blog',
-      dateTime: new Date(),
-    });
-
-    res.status(200).json({ message: 'Blog deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to delete blog', error: err.message });
+    await logActivity(req.admin._id, "deleted");
+    res.json({ message: "Blog deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete blog" });
   }
 };

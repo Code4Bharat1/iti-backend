@@ -1,10 +1,9 @@
-// middlewares/verifyAdmin.js
-
 import jwt from 'jsonwebtoken';
+import Admin from '../models/Admin.js'; // ✅ Make sure this is the correct path
 
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret"; // make sure it's in your .env
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
-const verifyAdmin = (req, res, next) => {
+const verifyAdmin = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -15,7 +14,13 @@ const verifyAdmin = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.adminId = decoded.id;
+
+    const admin = await Admin.findById(decoded.id); // ✅ Load the full admin
+    if (!admin) {
+      return res.status(401).json({ message: "Admin not found" });
+    }
+
+    req.admin = admin; // ✅ Set it for use in controller
     next();
   } catch (err) {
     return res.status(401).json({ message: "Unauthorized: Invalid token", error: err.message });
