@@ -29,22 +29,22 @@ export const createBlog = async (req, res) => {
       content,
       image,
       date,
-      createdBy: req.admin._id,
+      createdBy: req.adminId,
     });
 
     await newBlog.save();
 
     // Save admin activity
     await Activity.create({
-      user: req.admin.name || req.admin._id,
+      user: req.adminId,
       action: 'added',
       section: 'blog',
     });
 
     res.status(201).json(newBlog);
   } catch (err) {
-    console.error('Error adding blog:', err); // 👈 Log full error to backend console
-    res.status(500).json({ error: 'Failed to add blog' }); // 👈 Send clear error
+    console.error('Error adding blog:', err); // ?? Log full error to backend console
+    res.status(500).json({ error: 'Failed to add blog' }); // ?? Send clear error
   }
 };
 
@@ -55,7 +55,7 @@ export const updateBlog = async (req, res) => {
     const updatedBlog = await Blog.findByIdAndUpdate(id, req.body, { new: true });
     if (!updatedBlog) return res.status(404).json({ error: "Blog not found" });
 
-    await logActivity(req.admin._id, "updated");
+    await logActivity(req.adminId, "updated");
     res.json(updatedBlog);
   } catch (error) {
     res.status(500).json({ error: "Failed to update blog" });
@@ -68,7 +68,7 @@ export const deleteBlog = async (req, res) => {
     const deletedBlog = await Blog.findByIdAndDelete(id);
     if (!deletedBlog) return res.status(404).json({ error: "Blog not found" });
 
-    await logActivity(req.admin._id, "deleted");
+    await logActivity(req.adminId, "deleted");
     res.json({ message: "Blog deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete blog" });
