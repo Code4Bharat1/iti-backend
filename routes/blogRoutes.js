@@ -6,15 +6,14 @@ import {
   updateBlog,
   deleteBlog
 } from '../controllers/adminBlog.js';
-import multer from 'multer';
-
-const upload = multer({ dest: 'uploads/' });
+import { upload } from '../middlewares/multer.js';
 
 const router = express.Router();
 
 router.use(verifyAdmin);
 
-router.post('/', upload.single('image'), createBlog);
+
+router.post('/', verifyAdmin, upload.single('image'), createBlog);
 router.get('/', getBlogs);
 router.put('/:id', updateBlog);
 router.delete('/:id', deleteBlog);
