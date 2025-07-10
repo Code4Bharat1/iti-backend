@@ -9,11 +9,11 @@ import {
 
 const router = express.Router();
 
-router.use(verifyAdmin);
+// router.use(verifyAdmin);
 
-router.post('/', createNotice);
+router.post('/',verifyAdmin, createNotice);
 router.get('/', getNotices);
-router.put('/:id', updateNotice);
-router.delete('/:id', deleteNotice);
+router.put('/:id', verifyAdmin,updateNotice);
+router.delete('/:id', verifyAdmin, deleteNotice);
 
 export default router;

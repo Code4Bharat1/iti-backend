@@ -10,12 +10,12 @@ import { upload } from '../middlewares/multer.js';
 
 const router = express.Router();
 
-router.use(verifyAdmin);
+// router.use(verifyAdmin);
 
 
 router.post('/', verifyAdmin, upload.single('image'), createBlog);
 router.get('/', getBlogs);
-router.put('/:id', updateBlog);
-router.delete('/:id', deleteBlog);
+router.put('/:id',verifyAdmin, updateBlog);
+router.delete('/:id', verifyAdmin, deleteBlog);
 
 export default router;
