@@ -15,8 +15,6 @@ export const createBlog = async (req, res) => {
   try {
     const { title, content, date } = req.body;
     const image = req.file ? `/public/uploads/${req.file.filename}` : '';
-    const admin = await Admin.findById(req.adminId);
-    if (!admin) return res.status(404).json({ message: 'Admin not found' });
 
     const newBlog = new Blog({
       title,
@@ -38,8 +36,8 @@ export const createBlog = async (req, res) => {
 
     res.status(201).json(newBlog);
   } catch (err) {
-    console.error('Error adding blog:', err);
-    res.status(500).json({ error: 'Failed to add blog' });
+    console.error('Error adding blog:', err); // ?? Log full error to backend console
+    res.status(500).json({ error: 'Failed to add blog' }); // ?? Send clear error
   }
 };
 
@@ -49,8 +47,6 @@ export const updateBlog = async (req, res) => {
     const { id } = req.params;
     const allowedUpdates = ['title', 'content', 'image', 'date'];
     const updateData = {};
-    const admin = await Admin.findById(req.adminId);
-    if (!admin) return res.status(404).json({ message: 'Admin not found' });
 
     allowedUpdates.forEach((field) => {
       if (req.body[field] !== undefined) {
@@ -80,11 +76,9 @@ export const updateBlog = async (req, res) => {
     });
     res.json(updatedBlog);
   } catch (error) {
-    console.error("Update error:", error);
     res.status(500).json({ error: "Failed to update blog" });
   }
 };
-
 
 export const deleteBlog = async (req, res) => {
   try {

@@ -17,7 +17,7 @@ export const uploadImage = async (req, res) => {
     if (!file) return res.status(400).json({ message: 'No file uploaded' });
 
     // ✅ Build the real URL
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
 
     // ✅ Save it in DB
     const image = await Image.create({ imageUrl, uploadedBy: adminId });

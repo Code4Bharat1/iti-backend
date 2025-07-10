@@ -8,7 +8,6 @@ import blogRoutes from './routes/blogRoutes.js';
 import mediaRoutes from './routes/mediaRoutes.js';
 import topperRoutes from './routes/topperRoutes.js';
 import activityRoutes from './routes/activityRoutes.js';
-import newsRoutes from './routes/newsRoutes.js'
 import path from 'path';
 import { fileURLToPath } from 'url';
 dotenv.config();
@@ -26,6 +25,8 @@ app.use(cors({
 
 app.use(express.json());
 
+app.use('/uploads', express.static('uploads'));
+
 connectDB();
 
 app.use('/api/admin/auth', authRoutes);
@@ -34,7 +35,6 @@ app.use('/api/admin/blogs', blogRoutes);
 app.use('/api/admin/media', mediaRoutes);
 app.use('/api/admin/toppers', topperRoutes);
 app.use('/api/admin/activities', activityRoutes);
-app.use('/api/admin/news',newsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, ()=>console.log(`Server running on port ${PORT}`))
