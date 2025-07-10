@@ -9,6 +9,8 @@ const storage = new CloudinaryStorage({
     folder: 'blog_uploads', // change as needed
     allowed_formats: ['jpg', 'png', 'jpeg', 'avif', 'mp4', 'webm'],
     transformation: [{ width: 800, crop: 'scale' }],
+    resource_type: 'auto'
+
   },
 });
 
