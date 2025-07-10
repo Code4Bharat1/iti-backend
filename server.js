@@ -12,15 +12,20 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 dotenv.config();
 const app = express();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 app.use(cors({
-    origin:["http://localhost:3000"],
+    origin:["http://localhost:3000","http://localhost:3001"],
     credentials:true
 }));
 
 app.use(express.json());
+
+app.use('/uploads', express.static('uploads'));
 
 connectDB();
 
@@ -30,9 +35,6 @@ app.use('/api/admin/blogs', blogRoutes);
 app.use('/api/admin/media', mediaRoutes);
 app.use('/api/admin/toppers', topperRoutes);
 app.use('/api/admin/activities', activityRoutes);
-
-
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, ()=>console.log(`Server running on port ${PORT}`))

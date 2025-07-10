@@ -1,14 +1,15 @@
+// middleware/multer.js
 import multer from 'multer';
-import path from 'path';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from '../utils/cloudinary.js';
 
-// Define storage
-const storage = multer.diskStorage({
-  destination: './public/uploads',   // Keep files inside /public/uploads
-  filename: (req, file, cb) => {
-    // Save with timestamp to avoid name conflicts
-    cb(null, `${Date.now()}-${file.originalname}`);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'blog_uploads', // change as needed
+    allowed_formats: ['jpg', 'png', 'jpeg', 'avif', 'mp4', 'webm'],
+    transformation: [{ width: 800, crop: 'scale' }],
   },
 });
 
-// Create upload middleware
 export const upload = multer({ storage });

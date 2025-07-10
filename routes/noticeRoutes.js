@@ -11,9 +11,9 @@ const router = express.Router();
 
 // router.use(verifyAdmin);
 
-router.post('/', verifyAdmin, createNotice);
+router.post('/',verifyAdmin, createNotice);
 router.get('/', getNotices);
 router.put('/:id', verifyAdmin,updateNotice);
-router.delete('/:id',verifyAdmin, deleteNotice);
+router.delete('/:id', verifyAdmin, deleteNotice);
 
 export default router;
