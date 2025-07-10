@@ -14,7 +14,7 @@ export const getBlogs = async (req, res) => {
 export const createBlog = async (req, res) => {
   try {
     const { title, content, date } = req.body;
-    const image = req.file ? `/public/uploads/${req.file.filename}` : '';
+    const image = req.file ? req.file.path : ''; // Cloudinary URL
 
     const newBlog = new Blog({
       title,
@@ -26,7 +26,7 @@ export const createBlog = async (req, res) => {
 
     await newBlog.save();
 
-    // Save admin activity
+    const admin = await Admin.findById(req.adminId);
     await Activity.create({
       user: admin.email,
       action: 'created',
@@ -36,8 +36,8 @@ export const createBlog = async (req, res) => {
 
     res.status(201).json(newBlog);
   } catch (err) {
-    console.error('Error adding blog:', err); // ?? Log full error to backend console
-    res.status(500).json({ error: 'Failed to add blog' }); // ?? Send clear error
+    console.error('Error adding blog:', err);
+    res.status(500).json({ error: 'Failed to add blog' });
   }
 };
 
@@ -54,26 +54,26 @@ export const updateBlog = async (req, res) => {
       }
     });
 
-
-    // Optionally handle image update if using multer
     if (req.file) {
-      updateData.image = `/public/uploads/${req.file.filename}`;
+      updateData.image = req.file.path; // Cloudinary URL
     }
 
     const updatedBlog = await Blog.findByIdAndUpdate(
       id,
-      { $set: updateData },  // ✅ Ensure only provided fields are updated
+      { $set: updateData },
       { new: true }
     );
 
     if (!updatedBlog) return res.status(404).json({ error: "Blog not found" });
 
+    const admin = await Admin.findById(req.adminId);
     await Activity.create({
       user: admin.email,
       action: 'updated',
       section: 'blog',
       dateTime: new Date(),
     });
+
     res.json(updatedBlog);
   } catch (error) {
     res.status(500).json({ error: "Failed to update blog" });
