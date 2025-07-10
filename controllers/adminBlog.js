@@ -22,7 +22,7 @@ export const getBlogs = async (req, res) => {
 export const createBlog = async (req, res) => {
   try {
     const { title, content, date } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : '';
+    const image = req.file ? `/public/uploads/${req.file.filename}` : '';
 
     const newBlog = new Blog({
       title,
@@ -43,8 +43,8 @@ export const createBlog = async (req, res) => {
 
     res.status(201).json(newBlog);
   } catch (err) {
-    console.error('Error adding blog:', err); // ?? Log full error to backend console
-    res.status(500).json({ error: 'Failed to add blog' }); // ?? Send clear error
+    console.error('Error adding blog:', err);
+    res.status(500).json({ error: 'Failed to add blog' });
   }
 };
 
@@ -52,15 +52,37 @@ export const createBlog = async (req, res) => {
 export const updateBlog = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedBlog = await Blog.findByIdAndUpdate(id, req.body, { new: true });
+    const allowedUpdates = ['title', 'content', 'image', 'date'];
+    const updateData = {};
+
+    allowedUpdates.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+
+    // Optionally handle image update if using multer
+    if (req.file) {
+      updateData.image = `/public/uploads/${req.file.filename}`;
+    }
+
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      id,
+      { $set: updateData },  // ✅ Ensure only provided fields are updated
+      { new: true }
+    );
+
     if (!updatedBlog) return res.status(404).json({ error: "Blog not found" });
 
     await logActivity(req.adminId, "updated");
     res.json(updatedBlog);
   } catch (error) {
+    console.error("Update error:", error);
     res.status(500).json({ error: "Failed to update blog" });
   }
 };
+
 
 export const deleteBlog = async (req, res) => {
   try {
