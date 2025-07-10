@@ -1,14 +1,6 @@
 import Blog from "../models/Blog.js";
 import Activity from "../models/Activity.js";
-
-// Helper to log admin activities
-const logActivity = async (adminId, action) => {
-  await Activity.create({
-    user: adminId,
-    action,
-    section: "blog"
-  });
-};
+import Admin from "../models/Admin.js";
 
 export const getBlogs = async (req, res) => {
   try {
@@ -23,6 +15,8 @@ export const createBlog = async (req, res) => {
   try {
     const { title, content, date } = req.body;
     const image = req.file ? `/public/uploads/${req.file.filename}` : '';
+    const admin = await Admin.findById(req.adminId);
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
 
     const newBlog = new Blog({
       title,
@@ -36,9 +30,10 @@ export const createBlog = async (req, res) => {
 
     // Save admin activity
     await Activity.create({
-      user: req.adminId,
-      action: 'added',
+      user: admin.email,
+      action: 'created',
       section: 'blog',
+      dateTime: new Date(),
     });
 
     res.status(201).json(newBlog);
@@ -54,6 +49,8 @@ export const updateBlog = async (req, res) => {
     const { id } = req.params;
     const allowedUpdates = ['title', 'content', 'image', 'date'];
     const updateData = {};
+    const admin = await Admin.findById(req.adminId);
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
 
     allowedUpdates.forEach((field) => {
       if (req.body[field] !== undefined) {
@@ -75,7 +72,12 @@ export const updateBlog = async (req, res) => {
 
     if (!updatedBlog) return res.status(404).json({ error: "Blog not found" });
 
-    await logActivity(req.adminId, "updated");
+    await Activity.create({
+      user: admin.email,
+      action: 'updated',
+      section: 'blog',
+      dateTime: new Date(),
+    });
     res.json(updatedBlog);
   } catch (error) {
     console.error("Update error:", error);
@@ -89,8 +91,15 @@ export const deleteBlog = async (req, res) => {
     const { id } = req.params;
     const deletedBlog = await Blog.findByIdAndDelete(id);
     if (!deletedBlog) return res.status(404).json({ error: "Blog not found" });
+    const admin = await Admin.findById(req.adminId);
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
 
-    await logActivity(req.adminId, "deleted");
+    await Activity.create({
+      user: admin.email,
+      action: 'deleted',
+      section: 'blog',
+      dateTime: new Date(),
+    });
     res.json({ message: "Blog deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete blog" });
