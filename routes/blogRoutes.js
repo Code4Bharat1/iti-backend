@@ -12,11 +12,11 @@ const upload = multer({ dest: 'uploads/' });
 
 const router = express.Router();
 
-router.use(verifyAdmin);
+// router.use(verifyAdmin);
 
-router.post('/', upload.single('image'), createBlog);
+router.post('/', upload.single('image'), verifyAdmin,createBlog);
 router.get('/', getBlogs);
-router.put('/:id', updateBlog);
-router.delete('/:id', deleteBlog);
+router.put('/:id', verifyAdmin,updateBlog);
+router.delete('/:id', verifyAdmin,deleteBlog);
 
 export default router;

@@ -9,11 +9,11 @@ import {
 
 const router = express.Router();
 
-router.use(verifyAdmin);
+// router.use(verifyAdmin);
 
 // Images
-router.post("/addTopper",addTopper);
+router.post("/addTopper",verifyAdmin,addTopper);
 router.get("/getTopper",getToppers);
-router.put("/updateTopper/:id",updateTopper);
-router.delete("/deleteTopper/:id",deleteTopper);
+router.put("/updateTopper/:id",verifyAdmin,updateTopper);
+router.delete("/deleteTopper/:id",verifyAdmin,deleteTopper);
 export default router;
