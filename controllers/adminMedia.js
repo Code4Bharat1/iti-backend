@@ -24,7 +24,7 @@ export const uploadImage = async (req, res) => {
     const image = await Image.create({ imageUrl, uploadedBy: adminId });
 
     await Activity.create({
-      user: 'admin',
+      user: adminId.email,
       action: 'uploaded',
       section: 'image',
       dateTime: new Date(),
@@ -44,9 +44,11 @@ export const deleteImage = async (req, res) => {
   try {
     const image = await Image.findByIdAndDelete(id);
     if (!image) return res.status(404).json({ message: 'Image not found' });
+    const adminId = await Admin.findById(req.adminId);
+    if (!adminId) return res.status(404).json({ message: 'Admin not found' });
 
     await Activity.create({
-      user: 'admin',
+      user: admin.email,
       action: 'deleted',
       section: 'image',
       dateTime: new Date(),
@@ -101,7 +103,7 @@ export const uploadVideo = async (req, res) => {
     });
 
     await Activity.create({
-      user: 'admin',
+      user: admin.email,
       action: 'uploaded',
       section: 'video',
       dateTime: new Date(),
@@ -218,9 +220,10 @@ export const deleteVideo = async (req, res) => {
   try {
     const video = await Video.findByIdAndDelete(id);
     if (!video) return res.status(404).json({ message: 'Video not found' });
+    const admin = await Admin.findById(req.adminId)
 
     await Activity.create({
-      user: 'admin',
+      user: admin.email,
       action: 'deleted',
       section: 'video',
       dateTime: new Date(),

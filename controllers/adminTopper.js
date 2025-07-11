@@ -22,7 +22,7 @@ export const addTopper = async (req, res) => {
     });
 
     await Activity.create({
-      user: 'admin',
+      user: admin.email,
       action: 'added',
       section: 'topper',
       dateTime: new Date(),
@@ -56,14 +56,15 @@ export const updateTopper = async (req, res) => {
       { studentName, trade, percentage },
       { new: true }
     );
+    const admin = await Admin.findById(req.adminId);
 
     if (!topper) return res.status(404).json({ message: 'Topper not found' });
     await Activity.create({
-  user: 'admin',
-  action: 'added',
-  section: 'topper',  // ✅ should match your enum value
-  dateTime: new Date(),
-});
+      user: admin.email,
+      action: 'added',
+      section: 'topper',  // ✅ should match your enum value
+      dateTime: new Date(),
+    });
 
 
     res.status(200).json(topper);
@@ -78,12 +79,13 @@ export const deleteTopper = async (req, res) => {
 
 
   try {
-    console.log("id: ",id)
+    console.log("id: ", id)
     const topper = await Topper.findByIdAndDelete(id);
     if (!topper) return res.status(404).json({ message: 'Topper not found' });
+    const admin = await Admin.findById(req.adminId)
 
     await Activity.create({
-      user: 'admin',
+      user: admin.email,
       action: 'deleted',
       section: 'topper',
       dateTime: new Date(),
