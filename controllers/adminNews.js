@@ -46,9 +46,9 @@ export const getNews = async (req, res) => {
     const news = await News.find().sort({ createdAt: -1 });
 
     // Format the date for each notice
-    const formattedNews = news.map(notice => ({
-      ...notice._doc,
-      date: new Date(news.date).toLocaleDateString('en-GB', {
+    const formattedNews = news.map(item => ({
+      ...item._doc,
+      date: new Date(item.date).toLocaleDateString('en-GB', {
         day: '2-digit',
         month: 'long',
         year: 'numeric'
