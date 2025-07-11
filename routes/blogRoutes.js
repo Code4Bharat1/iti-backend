@@ -4,7 +4,8 @@ import {
   createBlog,
   getBlogs,
   updateBlog,
-  deleteBlog
+  deleteBlog,
+  getBlogById
 } from '../controllers/adminBlog.js';
 import { upload } from '../middlewares/multer.js';
 
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.post('/', verifyAdmin, upload.single('image'), createBlog);
 router.get('/', getBlogs);
+router.get('/:id', getBlogById);
 router.put('/:id', verifyAdmin, upload.single('image'), updateBlog);
 router.delete('/:id', verifyAdmin, deleteBlog);
 
