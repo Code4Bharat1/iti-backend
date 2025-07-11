@@ -9,11 +9,9 @@ import {
 
 const router = express.Router();
 
-router.use(verifyAdmin);
-
-router.post('/', createNews);
+router.post('/',verifyAdmin, createNews);
 router.get('/', getNews);
-router.put('/:id', updateNews);
-router.delete('/:id', deleteNews);
+router.put('/:id',verifyAdmin, updateNews);
+router.delete('/:id',verifyAdmin, deleteNews);
 
 export default router;
