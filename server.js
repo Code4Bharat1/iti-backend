@@ -18,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(cors({
-    origin:["http://localhost:3000","http://localhost:3001"],
+    origin:["http://localhost:3000","http://localhost:3001","https://maf-iti.nexcorealliance.com","https://iti-admin.nexcorealliance.com"],
     credentials:true
 }));
 
